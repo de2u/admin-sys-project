@@ -28,7 +28,7 @@ def mem():
         print('%-10s : %7s' % (name.capitalize(), value))
     print('')
 
-
+#test
 
 def main():
     print("CPU -----------------")
