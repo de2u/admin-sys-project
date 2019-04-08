@@ -4,6 +4,7 @@ import datetime
 import shutil, os
 
 loop_length = 20    # loop length in seconds
+received_data_folder = "receivedfiles"
 start_unix = str(time.time())   # start time
 
 db_name = 'collected_data.db'
@@ -32,12 +33,10 @@ def insert_record(unix_rec, datestamp, machineId, cpuPercent, memoryPercent, dis
     conn.commit()
 
 def read_record_file(filename): # outputs the input file as a list
-    file = open("receivedfiles/%s"%filename, "r")
+    file = open(received_data_folder + '/' + filename, "r")
     content = file.read().splitlines()
     file.close()
-    os.rename("receivedfiles/%s"%filename, "receivedfiles/used/%s"%filename)  # move file after read
-    for i in [0, 2, 3, 4, 5]:
-        content[i] = int(content[i])    # convert values to integer
+    os.rename(received_data_folder + '/' + filename, received_data_folder + '/used/' + filename)  # move file after read
     return content  # returns a list with all the info
 
 def treat_file(filename):   # reads file and inserts it into the database
@@ -45,8 +44,12 @@ def treat_file(filename):   # reads file and inserts it into the database
     insert_record(data[0], data[1], data[2], data[3], data[4], data[5])
 
 def treat_all_files():   # execute this every 30s or so
+    if not os.path.exists(received_data_folder):    # checks if folder exists, creates it if not
+        os.mkdir(received_data_folder)
+    if not os.path.exists(received_data_folder + '/used'):  # checks if used folder exists
+        os.mkdir(received_data_folder + '/used')
     filesToTreat = []   # list with all files to be treated
-    for (dirpath, dirnames, filenames) in os.walk('receivedfiles'):
+    for (dirpath, dirnames, filenames) in os.walk(received_data_folder):
         filesToTreat.extend(filenames)
         break
     print(filesToTreat)
