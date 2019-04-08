@@ -12,7 +12,7 @@ c = conn.cursor()   # cursor creation
 
 def create_receivedData_table():
     # table creation if inexistent
-    c.execute('CREATE TABLE IF NOT EXISTS receivedData(unix_rec INTEGER, unix_insert INTEGER, datestamp TEXT, machineId INTEGER PRIMARY KEY, cpuPercent REAL, memoryPercent REAL, diskPercent REAL)')
+    c.execute('CREATE TABLE IF NOT EXISTS receivedData(unix_rec REAL, unix_insert REAL, datestamp TEXT, machineId REAL, cpuPercent REAL, memoryPercent REAL, diskPercent REAL)')
 
 # def create_machineInfo_table():
 #     c.execute('CREATE TABLE IF NOT EXISTS machineInfo(machineId REAL, OS TEXT)')
@@ -65,7 +65,7 @@ def db_backup_hourly(name):
     backup_folder = "dbbackup"
     current_unix = int(time.time())
     if (float(current_unix) - float(start_unix)) % 3600 <= loop_length:
-        
+
         file_list = os.listdir(backup_folder)
         i = len(file_list)
         for filename in reversed(file_list):
