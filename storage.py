@@ -1,8 +1,10 @@
 import sqlite3
 import time
 import datetime
-import os
-from os import walk
+import shutil, os
+
+loop_length = 20    # loop length in seconds
+start_unix = str(time.time())   # start time
 
 db_name = 'collected_data.db'
 conn = sqlite3.connect(db_name) # connection to db
@@ -44,7 +46,7 @@ def treat_file(filename):   # reads file and inserts it into the database
 
 def treat_all_files():   # execute this every 30s or so
     filesToTreat = []   # list with all files to be treated
-    for (dirpath, dirnames, filenames) in walk('receivedfiles'):
+    for (dirpath, dirnames, filenames) in os.walk('receivedfiles'):
         filesToTreat.extend(filenames)
         break
     print(filesToTreat)
@@ -58,6 +60,23 @@ def del_old(delay=24):  # deletes entries older than delay (in hours)
     c.execute('DELETE FROM receivedData WHERE unix_insert < %s' %oldest)
     conn.commit()
 
+def db_backup_hourly(name):
+    name = name[:-3]
+    backup_folder = "dbbackup"
+    current_unix = int(time.time())
+    if (float(current_unix) - float(start_unix)) % 3600 <= loop_length:
+        
+        file_list = os.listdir(backup_folder)
+        i = len(file_list)
+        for filename in reversed(file_list):
+            if i <= 5:
+                os.rename(backup_folder + '/' + filename, backup_folder + '/' + name + str(i))
+            else:
+                os.remove(backup_folder + '/' + filename)
+            i -= 1
+        shutil.copy(name+'.db', backup_folder)
+        os.rename(backup_folder + '/' + name + '.db', backup_folder + '/' +  name + '0')
+
 def startup():
     create_receivedData_table()
     # create_machineInfo_table()
@@ -68,6 +87,7 @@ def update_loop():
         treat_all_files()
         del_old(2)
         read_receivedData()
-        time.sleep(20)
+        db_backup_hourly(db_name)
+        time.sleep(loop_length)
 
 startup()
