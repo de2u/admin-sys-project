@@ -1,39 +1,21 @@
-import psutil
+import psutil   # 'python3 -m pip install psutil' on windows
+import time
+import datetime
+import shutil
+from sensorcfg import *
 
-def octetsvershumain(n):
-    symboles = ('K', 'M', 'G', 'T', 'P')
-    prefixe = {}
-    for i, s in enumerate(symboles):
-        prefixe[s] = 1 << (i + 1) * 10
-    for s in reversed(symboles):
-        if n >= prefixe[s]:
-            value = float(n) / prefixe[s]
-            return '%.1f%s' % (value, s)
-    return "%so" % n
-
-def cpu():
-    stats=[]
-    cpu_core_percent = psutil.cpu_percent(interval=2,percpu=True)
-
-    for y in range(0,4):
-        stats.append(cpu_core_percent[y])
-    return stats
-
-def mem():
-    virtmem = psutil.virtual_memory()
-    for name in virtmem._fields:
-        value = getattr(virtmem, name)
-        if name != 'percent':
-            value = octetsvershumain(value)
-        print('%-10s : %7s' % (name.capitalize(), value))
-    print('')
-
-#test
+def write_to_file(filename):
+    f = open(str(filename), "w+")   # opening/creating file for writing
+    unix = int(time.time())
+    date = str(datetime.datetime.fromtimestamp(unix).strftime('%Y %m %d %H:%M:%S'))
+    cpu = psutil.cpu_percent(interval=1)
+    mem = psutil.virtual_memory()[2]
+    disk_total, disk_used, disk_free = shutil.disk_usage("\\")
+    disk_percent = "%.1f" % (disk_used/disk_total*100)
+    f.write(str(unix)+'\n'+date+'\n'+str(machineId)+'\n'+str(cpu)+'\n'+str(mem)+'\n'+str(disk_percent))
+    f.close()
 
 def main():
-    print("CPU -----------------")
-    print(cpu())
-    print("\nMEMORY --------------")
-    mem()
+    write_to_file(12345)
 
 main()
