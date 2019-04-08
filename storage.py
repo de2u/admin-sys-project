@@ -63,6 +63,8 @@ def del_old(delay=24):  # deletes entries older than delay (in hours)
 def db_backup_hourly(name):
     name = name[:-3]
     backup_folder = "dbbackup"
+    if not os.path.exists(backup_folder):
+        os.mkdir(backup_folder)
     current_unix = int(time.time())
     if (float(current_unix) - float(start_unix)) % 3600 <= loop_length:
 

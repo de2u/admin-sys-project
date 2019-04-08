@@ -1,7 +1,8 @@
 import psutil   # 'python3 -m pip install psutil' on windows
+import shutil
+import os
 import time
 import datetime
-import shutil
 from sensorcfg import *
 
 def write_to_file(filename):
@@ -14,8 +15,17 @@ def write_to_file(filename):
     disk_percent = "%.1f" % (disk_used/disk_total*100)
     f.write(str(unix)+'\n'+date+'\n'+str(machineId)+'\n'+str(cpu)+'\n'+str(mem)+'\n'+str(disk_percent))
     f.close()
+    print(str(unix)+'\n'+date+'\n'+str(machineId)+'\n'+str(cpu)+'\n'+str(mem)+'\n'+str(disk_percent))
 
 def main():
-    write_to_file(12345)
+    fileId = 1
+    if not os.path.exists(sensor_data_folder):
+        os.mkdir(sensor_data_folder)
+    while True:
+        filename = sensor_data_folder + '/' + str(machineId) + '_' + hex(fileId)
+        print('\n\n' + filename + ':\n')
+        write_to_file(filename)
+        fileId += 1
+        time.sleep(loop_length)
 
 main()
