@@ -4,16 +4,15 @@ import datetime
 import shutil, os
 
 loop_length = 20    # loop length in seconds
-received_data_folder = "receivedfiles"
 start_unix = str(time.time())   # start time
 
 db_name = 'collected_data.db'
-conn = sqlite3.connect(db_name) # connection to db
+conn = sqlite3.connect(db_name,timeout=10) # connection to db
 c = conn.cursor()   # cursor creation
 
 def create_receivedData_table():
     # table creation if inexistent
-    c.execute('CREATE TABLE IF NOT EXISTS receivedData(unix_rec INTEGER, unix_insert INTEGER, datestamp TEXT, machineId REAL, cpuPercent REAL, memoryPercent REAL, diskPercent REAL)')
+    c.execute('CREATE TABLE IF NOT EXISTS receivedData(unix_rec INTEGER, unix_insert INTEGER, datestamp TEXT, machineId INTEGER, hostname TEXT, machineIp TEXT, cpuPercent REAL, memoryPercent REAL, diskPercent REAL, user TEXT)')
 
 # def create_machineInfo_table():
 #     c.execute('CREATE TABLE IF NOT EXISTS machineInfo(machineId REAL, OS TEXT)')
@@ -25,31 +24,27 @@ def read_receivedData():
     print(50*'#')
 
 
-def insert_record(unix_rec, datestamp, machineId, cpuPercent, memoryPercent, diskPercent):
+def insert_record(unix_rec, datestamp, machineId, hostname, machineIp, cpuPercent, memoryPercent, diskPercent, user):
     unix_insert = int(time.time())
     c.execute("""
-        INSERT INTO receivedData (unix_rec, unix_insert, datestamp, machineId, cpuPercent, memoryPercent, diskPercent)
-        VALUES (?, ?, ?, ?, ?, ?, ?)""", (unix_rec, unix_insert, datestamp, machineId, cpuPercent, memoryPercent, diskPercent))
+        INSERT INTO receivedData (unix_rec, unix_insert, datestamp, machineId, hostname, machineIp, cpuPercent, memoryPercent, diskPercent, user)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (unix_rec, unix_insert, datestamp, machineId, hostname, machineIp, cpuPercent, memoryPercent, diskPercent, user))
     conn.commit()
 
 def read_record_file(filename): # outputs the input file as a list
-    file = open(received_data_folder + '/' + filename, "r")
+    file = open("receivedfiles/%s"%filename, "r")
     content = file.read().splitlines()
     file.close()
-    os.rename(received_data_folder + '/' + filename, received_data_folder + '/used/' + filename)  # move file after read
+    os.rename("receivedfiles/%s"%filename, "receivedfiles/used/%s"%filename)  # move file after read
     return content  # returns a list with all the info
 
 def treat_file(filename):   # reads file and inserts it into the database
     data = read_record_file(filename)
-    insert_record(data[0], data[1], data[2], data[3], data[4], data[5])
+    insert_record(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7])
 
 def treat_all_files():   # execute this every 30s or so
-    if not os.path.exists(received_data_folder):    # checks if folder exists, creates it if not
-        os.mkdir(received_data_folder)
-    if not os.path.exists(received_data_folder + '/used'):  # checks if used folder exists
-        os.mkdir(received_data_folder + '/used')
     filesToTreat = []   # list with all files to be treated
-    for (dirpath, dirnames, filenames) in os.walk(received_data_folder):
+    for (dirpath, dirnames, filenames) in os.walk('receivedfiles'):
         filesToTreat.extend(filenames)
         break
     print(filesToTreat)
@@ -66,8 +61,6 @@ def del_old(delay=24):  # deletes entries older than delay (in hours)
 def db_backup_hourly(name):
     name = name[:-3]
     backup_folder = "dbbackup"
-    if not os.path.exists(backup_folder):
-        os.mkdir(backup_folder)
     current_unix = int(time.time())
     if (float(current_unix) - float(start_unix)) % 3600 <= loop_length:
 
