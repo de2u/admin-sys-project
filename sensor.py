@@ -17,7 +17,7 @@ def write_to_file(filename):
     name = socket.gethostname()
     user = getpass.getuser()
 
-    disk_total, disk_used, disk_free = shutil.disk_usage('\\')
+    disk_total, disk_used, disk_free = shutil.disk_usage('/')
     disk_percent = "%.1f" % (disk_used/disk_total*100)
 
     f.write(str(unix)+'\n'+date+'\n'+str(machineId)+'\n'+str(ip)+'\n'+str(name)+'\n'+str(cpu)+'\n'+str(mem)+'\n'+str(disk_percent)+'\n'+str(user))
