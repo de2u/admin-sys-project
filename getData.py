@@ -13,7 +13,7 @@ for i in range(0, j):
     ip=ordi[i][1]
     user=ordi[i][0]
     path="/home/administrator/receivedfiles"
-    path2="/home/client/sensordata/*"
+    path2="/home/"+user+"/sensordata/*"
     term=user+"@"+ip+":"+path2
     cmd= "rsync --remove-source-files -e ssh "+term+" "+path
     Popen(cmd, shell=True)
