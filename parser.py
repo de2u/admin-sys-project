@@ -13,13 +13,10 @@ respData = resp.read()
 # print(respData)
 
 titles = re.findall(r'<title>(.*?)</title>',str(respData))
-links = re.findall(r'<guid ispermalink=\"true\">(.*)</guid>',str(respData))
+links = re.findall(r'<link>(.*?)</link>',str(respData))
 
+del titles[0]
+del links[0]
 
-for eachT in titles:
-    print(eachT)
-
-print(100*'#')
-
-for eachL in links:
-    print(eachL)
+for i in reversed(range(len(titles))):
+    print(titles[i],'\n',links[i],'\n\n')
