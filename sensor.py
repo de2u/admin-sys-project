@@ -20,9 +20,9 @@ def write_to_file(filename):
     disk_total, disk_used, disk_free = shutil.disk_usage('/')
     disk_percent = "%.1f" % (disk_used/disk_total*100)
 
-    f.write(str(unix)+'\n'+date+'\n'+str(machineId)+'\n'+str(ip)+'\n'+str(name)+'\n'+str(cpu)+'\n'+str(mem)+'\n'+str(disk_percent)+'\n'+str(user))
+    f.write(str(unix)+'\n'+date+'\n'+str(machineId)+'\n'+str(name)+'\n'+str(ip)+'\n'+str(cpu)+'\n'+str(mem)+'\n'+str(disk_percent)+'\n'+str(user))
     f.close()
-    print(str(unix)+'\n'+date+'\n'+str(machineId)+'\n'+str(ip)+'\n'+str(name)+'\n'+str(cpu)+'\n'+str(mem)+'\n'+str(disk_percent)+'\n'+str(user))
+    print(str(unix)+'\n'+date+'\n'+str(machineId)+'\n'+str(name)+'\n'+str(ip)+'\n'+str(name)+'\n'+str(cpu)+'\n'+str(mem)+'\n'+str(disk_percent)+'\n'+str(user))
     #subprocess.call("./disk_usage.sh")                                                 /Script bash permettant de rajouter à la fin du dernier fichier txt de data le % de stockage utilisé
 
 def main():

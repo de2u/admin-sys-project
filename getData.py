@@ -1,4 +1,4 @@
-from subprocess import call
+from subprocess import Popen
 import sqlite3
 
 
@@ -6,16 +6,16 @@ db_name = 'collected_data.db'
 conn = sqlite3.connect(db_name,timeout=10) # connection to db
 c = conn.cursor()   # cursor creation
 c.execute("SELECT DISTINCT user, machineIp FROM receivedData")
-ordi = cur.fetchall()
+ordi = c.fetchall()
 
-j = len(machine)
+j = len(ordi)
 for i in range(0, j):
     ip=ordi[i][1]
-    user=machine[i][0]
+    user=ordi[i][0]
     path="/home/administrator/receivedfiles"
     path2="/home/client/sensordata/*"
     term=user+"@"+ip+":"+path2
-
-    call(["rsync --remove-source-files -e ssh", term, path])
+    cmd= "rsync --remove-source-files -e ssh "+term+" "+path
+    Popen(cmd, shell=True)
 
     
