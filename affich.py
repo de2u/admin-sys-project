@@ -21,7 +21,6 @@ def affichage(x):                                                       #recuper
 
     c.execute("SELECT memoryPercent,cpuPercent,diskPercent FROM receivedData WHERE machineId = ? ORDER BY datestamp DESC" , xVal) #selection de critere memoir, cpu et disk de la machine selectionné dans l'ordre du plus recent au plus vieux
     recup=c.fetchall()
-    print(recup)
     ram=[]
     cpu=[]
     disk=[]
@@ -38,10 +37,8 @@ def affichage(x):                                                       #recuper
     rep=input()
     while rep != 'Y'||rep!='N':      #Si 
         if rep == 'Y':
-            conn.close()
             affichage_graphe(x,ram,cpu)         #appel de la fonction pour creer le graphe
         if rep == 'N':
-            conn.close()
             welcome()
 
 

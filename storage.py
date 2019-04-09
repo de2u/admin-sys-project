@@ -2,6 +2,7 @@ import sqlite3
 import time
 import datetime
 import shutil, os
+from getData import recup
 
 loop_length = 20    # loop length in seconds
 start_unix = str(time.time())   # start time
@@ -35,12 +36,13 @@ def read_record_file(filename): # outputs the input file as a list
     file = open("receivedfiles/%s"%filename, "r")
     content = file.read().splitlines()
     file.close()
-    os.rename("receivedfiles/%s"%filename, "receivedfiles/used/%s"%filename)  # move file after read
+    os.remove("receivedfiles/%s"%filename)  # remove file after read
     return content  # returns a list with all the info
 
 def treat_file(filename):   # reads file and inserts it into the database
     data = read_record_file(filename)
-    insert_record(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7])
+    if len(data)==9:
+        insert_record(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
 
 def treat_all_files():   # execute this every 30s or so
     filesToTreat = []   # list with all files to be treated
@@ -50,6 +52,7 @@ def treat_all_files():   # execute this every 30s or so
     print(filesToTreat)
     for i in filesToTreat:
         treat_file(i)
+    print(len(filesToTreat)," nouvelles lignes ont été ajouté à la bdd.")
 
 def del_old(delay=24):  # deletes entries older than delay (in hours)
     current_unix = int(time.time())
@@ -82,6 +85,7 @@ def startup():
 
 def update_loop():
     while True:
+        recup()
         treat_all_files()
         del_old(2)
         read_receivedData()
