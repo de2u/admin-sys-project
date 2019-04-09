@@ -12,10 +12,10 @@ j = len(machine)
 for i in range(0, j):
     ip=ordi[i][1]
     user=machine[i][0]
-    path="/home/administrator/sensordata/"
-    path2="/home/client/sensordata/"
+    path="/home/administrator/receivedfiles"
+    path2="/home/client/sensordata/*"
     term=user+"@"+ip+":"+path2
 
-    call(["scp -r", term, path])
+    call(["rsync --remove-source-files -e ssh", term, path])
 
     
